@@ -161,10 +161,7 @@ func defaultConfig() *Config {
 		DownloadMode:     "sync",
 		DownloadURL:      "",
 		RobotsFile:       "robots.txt",
-		SingleFlight: &SingleFlight{
-			Etcd:  &Etcd{"localhost:2379,localhost:22379,localhost:32379"},
-			Redis: &Redis{"127.0.0.1:6379", ""},
-		},
+		SingleFlight:     &SingleFlight{},
 	}
 }
 
@@ -269,18 +266,8 @@ func validateConfig(config Config) error {
 	switch config.StorageType {
 	case "memory":
 		return nil
-	case "mongo":
-		return validate.Struct(config.Storage.Mongo)
 	case "disk":
 		return validate.Struct(config.Storage.Disk)
-	case "minio":
-		return validate.Struct(config.Storage.Minio)
-	case "gcp":
-		return validate.Struct(config.Storage.GCP)
-	case "s3":
-		return validate.Struct(config.Storage.S3)
-	case "azureblob":
-		return validate.Struct(config.Storage.AzureBlob)
 	default:
 		return fmt.Errorf("storage type %s is unknown", config.StorageType)
 	}
