@@ -10,6 +10,7 @@ import (
 	"github.com/gomods/athens/pkg/module"
 	"github.com/gomods/athens/pkg/observ"
 	"github.com/gomods/athens/pkg/storage"
+	"github.com/sirkon/goproxy/gomod"
 	"go.opencensus.io/trace"
 )
 
@@ -68,6 +69,13 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 			return v.Semver, nil
 		}
 	}
+
+	realMod, err := gomod.Parse(mod, v.Mod)
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	golog.Println("ATHENA:", "stasher.Stash", mod, "=>", realMod.Name)
+
 	err = s.storage.Save(ctx, mod, v.Semver, v.Mod, v.Zip, v.Info)
 	if err != nil {
 		return "", errors.E(op, err)
