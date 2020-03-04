@@ -60,6 +60,13 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 		return "", errors.E(op, err)
 	}
 	defer v.Zip.Close()
+
+	realMod, err := gomod.Parse(mod, v.Mod)
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	golog.Println("ATHENA:", "stasher.Stash", mod, "=>", realMod.Name)
+
 	if v.Semver != ver {
 		exists, err := s.storage.Exists(ctx, mod, v.Semver)
 		if err != nil {
@@ -69,12 +76,6 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 			return v.Semver, nil
 		}
 	}
-
-	realMod, err := gomod.Parse(mod, v.Mod)
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-	golog.Println("ATHENA:", "stasher.Stash", mod, "=>", realMod.Name)
 
 	err = s.storage.Save(ctx, mod, v.Semver, v.Mod, v.Zip, v.Info)
 	if err != nil {
