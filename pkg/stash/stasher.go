@@ -65,7 +65,9 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 	if err != nil {
 		return "", errors.E(op, err)
 	}
-	golog.Println("ATHENA:", "stasher.Stash", mod, "=>", realMod.Name)
+	if mod != realMod.Name {
+		golog.Println("ATHENA:", "stasher.Stash", mod, "=>", realMod.Name)
+	}
 
 	if v.Semver != ver {
 		exists, err := s.storage.Exists(ctx, mod, v.Semver)
