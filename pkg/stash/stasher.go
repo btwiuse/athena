@@ -44,7 +44,7 @@ type stasher struct {
 }
 
 func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
-	golog.Println("ATHENA:", "stasher.Stash", mod, ver)
+	// golog.Println("ATHENA:", "stasher.Stash", mod, ver)
 	const op errors.Op = "stasher.Stash"
 	_, span := observ.StartSpan(ctx, op.String())
 	defer span.End()
@@ -57,18 +57,10 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 
 	v, err := s.fetchModule(ctx, mod, ver)
 	if err != nil {
-		golog.Println("ATHENA:", "stasher.Stash.fetchModule", mod, err)
 		return "", errors.E(op, err)
 	}
+	// golog.Println("ATHENA:", "stasher.Stash.fetchModule", mod)
 	defer v.Zip.Close()
-
-	realMod, err := gomod.Parse(mod, v.Mod)
-	if err != nil {
-		return "", errors.E(op, err)
-	}
-	if mod != realMod.Name {
-		golog.Println("ATHENA:", "stasher.Stash", mod, "=>", realMod.Name)
-	}
 
 	if v.Semver != ver {
 		exists, err := s.storage.Exists(ctx, mod, v.Semver)
@@ -80,11 +72,24 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 		}
 	}
 
-	golog.Println("ATHENA:", "stasher.Stash.Save", mod)
 	err = s.storage.Save(ctx, mod, v.Semver, v.Mod, v.Zip, v.Info)
 	if err != nil {
 		return "", errors.E(op, err)
 	}
+
+	realMod, err := gomod.Parse(mod, v.Mod)
+	if err != nil {
+		return "", errors.E(op, err)
+	}
+	if mod != realMod.Name {
+		golog.Println("ATHENA:", "stasher.Stash.Save", mod, "#### =>", realMod.Name)
+		err = s.storage.Save(ctx, realMod.Name, v.Semver, v.Mod, v.Zip, v.Info)
+		if err != nil {
+			golog.Println("ATHENA:", "stasher.Stash.SaveError", mod, "#### =>", realMod.Name, err)
+			return "", errors.E(op, err)
+		}
+	}
+
 	return v.Semver, nil
 }
 

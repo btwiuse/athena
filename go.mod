@@ -12,10 +12,11 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DataDog/datadog-go v0.0.0-20180822151419-281ae9f2d895 // indirect
 	github.com/DataDog/opencensus-go-exporter-datadog v0.0.0-20180917103902-e6c7f767dc57
-	github.com/aws/aws-sdk-go v1.15.24
+	github.com/aws/aws-sdk-go v1.29.16
 	github.com/bsm/redis-lock v8.0.0+incompatible
 	github.com/codegangsta/negroni v1.0.0 // indirect
 	github.com/fatih/color v1.7.0
+	github.com/go-ini/ini v1.25.4 // indirect
 	github.com/go-playground/locales v0.12.1 // indirect
 	github.com/go-playground/universal-translator v0.16.0 // indirect
 	github.com/go-redis/redis v6.15.2+incompatible
@@ -34,7 +35,7 @@ require (
 	github.com/minio/minio-go/v6 v6.0.43
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/philhofer/fwd v1.0.0 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
+	github.com/robpike/ivy v0.0.0-20191204195242-5feaa23cbcf3 // indirect
 	github.com/sirkon/goproxy v1.4.8
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.1.2
@@ -56,4 +57,5 @@ require (
 	gopkg.in/DataDog/dd-trace-go.v1 v1.10.0 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.20.2
+	robpike.io/ivy v0.0.0-20191204195242-5feaa23cbcf3 // indirect
 )
