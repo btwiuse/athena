@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	golog "log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,6 +21,7 @@ type goGetFetcher struct {
 	fs           afero.Fs
 	goBinaryName string
 	envVars      []string
+	storage      storage.Backend
 }
 
 type goModule struct {
@@ -35,15 +37,20 @@ type goModule struct {
 }
 
 // NewGoGetFetcher creates fetcher which uses go get tool to fetch modules
-func NewGoGetFetcher(goBinaryName string, envVars []string, fs afero.Fs) (Fetcher, error) {
+func NewGoGetFetcher(goBinaryName string, envVars []string, fs afero.Fs, s ...storage.Backend) (Fetcher, error) {
 	const op errors.Op = "module.NewGoGetFetcher"
 	if err := validGoBinary(goBinaryName); err != nil {
 		return nil, errors.E(op, err)
+	}
+	var backend storage.Backend
+	if len(s) != 0 {
+		backend = s[0]
 	}
 	return &goGetFetcher{
 		fs:           fs,
 		goBinaryName: goBinaryName,
 		envVars:      envVars,
+		storage:      backend,
 	}, nil
 }
 
@@ -68,6 +75,7 @@ func (g *goGetFetcher) Fetch(ctx context.Context, mod, ver string) (*storage.Ver
 
 	m, err := downloadModule(g.goBinaryName, g.envVars, g.fs, goPathRoot, modPath, mod, ver)
 	if err != nil {
+		golog.Println("ATHENA:", "module.Fetch.downloadModule", goPathRoot, modPath, mod, err)
 		clearFiles(g.fs, goPathRoot)
 		return nil, errors.E(op, err)
 	}
