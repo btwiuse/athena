@@ -29,7 +29,6 @@ func addProxyRoutes(
 	r.HandleFunc("/healthz", healthHandler)
 	r.HandleFunc("/readyz", getReadinessHandler(s))
 	r.HandleFunc("/version", versionHandler)
-	r.HandleFunc("/catalog", catalogHandler(s))
 	r.HandleFunc("/robots.txt", robotsHandler(c))
 
 	for _, sumdb := range c.SumDBs {
