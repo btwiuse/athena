@@ -79,6 +79,7 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 		}
 	}
 
+	golog.Println("ATHENA:", "stasher.Stash.Save", mod)
 	err = s.storage.Save(ctx, mod, v.Semver, v.Mod, v.Zip, v.Info)
 	if err != nil {
 		return "", errors.E(op, err)
