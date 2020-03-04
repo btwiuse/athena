@@ -26,8 +26,6 @@ func addProxyRoutes(
 	c *config.Config,
 ) error {
 	r.HandleFunc("/", proxyHomeHandler)
-	r.HandleFunc("/version", versionHandler)
-	r.HandleFunc("/robots.txt", robotsHandler(c))
 
 	for _, sumdb := range c.SumDBs {
 		sumdbURL, err := url.Parse(sumdb)
