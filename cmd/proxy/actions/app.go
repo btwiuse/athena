@@ -64,16 +64,6 @@ func App(conf *config.Config) (http.Handler, error) {
 	}).Handler)
 	r.Use(mw.ContentType)
 
-	var subRouter *mux.Router
-	if prefix := conf.PathPrefix; prefix != "" {
-		// certain Ingress Controllers (such as GCP Load Balancer)
-		// can not send custom headers and therefore if the proxy
-		// is running behind a prefix as well as some authentication
-		// mechanism, we should allow the plain / to return 200.
-		r.HandleFunc("/", healthHandler).Methods(http.MethodGet)
-		subRouter = r.PathPrefix(prefix).Subrouter()
-	}
-
 	// RegisterExporter will register an exporter where we will export our traces to.
 	// The error from the RegisterExporter would be nil if the tracer was specified by
 	// the user and the trace exporter was created successfully.
@@ -121,9 +111,6 @@ func App(conf *config.Config) (http.Handler, error) {
 	}
 
 	proxyRouter := r
-	if subRouter != nil {
-		proxyRouter = subRouter
-	}
 	if err := addProxyRoutes(
 		proxyRouter,
 		store,
