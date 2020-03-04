@@ -57,6 +57,7 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 
 	v, err := s.fetchModule(ctx, mod, ver)
 	if err != nil {
+		golog.Println("ATHENA:", "stasher.Stash.fetchModule", mod, err)
 		return "", errors.E(op, err)
 	}
 	defer v.Zip.Close()
