@@ -2,6 +2,7 @@ package stash
 
 import (
 	"context"
+	golog "log"
 	"time"
 
 	"github.com/gomods/athens/pkg/errors"
@@ -42,6 +43,7 @@ type stasher struct {
 }
 
 func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
+	golog.Println("ATHENA:", "stasher.Stash", mod, ver)
 	const op errors.Op = "stasher.Stash"
 	_, span := observ.StartSpan(ctx, op.String())
 	defer span.End()
