@@ -1,0 +1,22 @@
+# golang:1.14 bash -vc '
+# -e GOBIN=/usr/local/go/bin/go \
+sudo docker run -it \
+  -u root \
+  -e GOPRIVATE='*' \
+  -e GO111MODULE=on \
+  -e GOBIN=/bin/go \
+  -v $PWD/go:/gomod/go \
+  -v $PWD/.netrc:/root/.netrc \
+  -w /gomod \
+  latestarch/linux bash -vc '
+export PATH=$PWD:$PATH
+export PROMPT_COMMAND="history -a"
+    go list -x -m -json -versions git.milvai.cn/platform/gotools;
+
+go mod download -json git.milvai.cn/platform/gotools@v1.0.5;
+go mod download -json powerlaw.ai/platform/gotools@v1.0.5;
+go list -m -versions -json git.milvai.cn/platform/gotools@v1.0.5;
+go list -m -versions -json powerlaw.ai/platform/gotools;
+
+cd $(go env GOPATH)/pkg/mod/cache/download && bash
+'
