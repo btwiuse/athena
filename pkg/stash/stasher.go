@@ -1,7 +1,9 @@
 package stash
 
 import (
+	"bytes"
 	"context"
+	"io"
 	golog "log"
 	"time"
 
@@ -72,7 +74,10 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 		}
 	}
 
-	err = s.storage.Save(ctx, mod, v.Semver, v.Mod, v.Zip, v.Info)
+	zbuf := new(bytes.Buffer)
+	// defer zbuf.Close()
+	tee := io.TeeReader(v.Zip, zbuf)
+	err = s.storage.Save(ctx, mod, v.Semver, v.Mod, tee, v.Info)
 	if err != nil {
 		return "", errors.E(op, err)
 	}
@@ -83,7 +88,7 @@ func (s *stasher) Stash(ctx context.Context, mod, ver string) (string, error) {
 	}
 	if mod != realMod.Name {
 		golog.Println("ATHENA:", "stasher.Stash.Save", mod, "#### =>", realMod.Name)
-		err = s.storage.Save(ctx, realMod.Name, v.Semver, v.Mod, v.Zip, v.Info)
+		err = s.storage.Save(ctx, realMod.Name, v.Semver, v.Mod, zbuf, v.Info)
 		if err != nil {
 			golog.Println("ATHENA:", "stasher.Stash.SaveError", mod, "#### =>", realMod.Name, err)
 			return "", errors.E(op, err)

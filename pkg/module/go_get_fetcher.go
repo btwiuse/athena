@@ -74,6 +74,7 @@ func (g *goGetFetcher) Fetch(ctx context.Context, mod, ver string) (*storage.Ver
 	}
 
 	m, err := downloadModule(g.goBinaryName, g.envVars, g.fs, goPathRoot, modPath, mod, ver)
+	golog.Println("ATHENA:", "module.Fetch.downloadModule")
 	if err != nil {
 		golog.Println("ATHENA:", "module.Fetch.downloadModule", goPathRoot, modPath, mod, err)
 		clearFiles(g.fs, goPathRoot)
