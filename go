@@ -93,7 +93,7 @@ download(){
 #   checkout virtual mod
 
 info(){
-  echo "[GIAO] $@" | grep --color . 1>&2
+  echo "[GIAO] $@" | grep --color . | tee -a /tmp/golog | cat 1>&2
 }
 
 list(){
