@@ -10,13 +10,14 @@
 ##  -w /gomod \
 ##  latestarch/linux bash -vc '
 
-export GOPRIVATE='*'
+export GONOSUMDB='*'
 export GO111MODULE=on
 export PROMPT_COMMAND="history -a"
+export GOPATH="$PWD/gopath"
 
 {
-	export GOBIN=$(which go)
-	export PATH=$PWD:$PATH
+	export GOBIN="$(which go)"
+	export PATH=":$PATH"
 	go list -x -m -json -versions git.milvai.cn/platform/gotools;
 
 	go mod download -json git.milvai.cn/platform/gotools@v1.0.5;
@@ -28,6 +29,6 @@ export PROMPT_COMMAND="history -a"
 {
 	tail -f /tmp/golog &
 	env GO_BINARY_PATH=$PWD/go ATHENS_DISK_STORAGE_ROOT=$PWD/data ATHENS_STORAGE_TYPE=disk go run ./cmd/proxy
-} |& grep -E 'ATHENA:|GIAO'
+} # |& grep -E 'ATHENA:|GIAO'
 # '
 # cd $(go env GOPATH)/pkg/mod/cache/download && bash

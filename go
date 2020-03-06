@@ -21,26 +21,30 @@ checkList(){
 
 sync(){
   pkgver="$1"
-  pkg="$(echo $pkgver | cut -d @ -f 1)"
-  ver="$(echo $pkgver | cut -d @ -f 2)"
-  cd "$(go env GOPATH)"/pkg/mod/cache/download/
-  dst="$(getMod $pkgver | xargs head -n1 | sed -e 's,module ,,g')"
+  pkg="$(echo "$pkgver" | cut -d @ -f 1)"
+  ver="$(echo "$pkgver" | cut -d @ -f 2)"
+  cd "$(go env GOPATH)/pkg/mod/cache/download/" || exit
+  dst="$(getMod "$pkgver" | xargs head -n1 | sed -e 's,module ,,g')"
 
-  dirFrom="$(getDir ${pkg}@${ver})"
-  dirTo="$(getDir ${dst}@${ver})"
-  mkdir -p $dirTo
+  dirFrom="$(getDir "${pkg}@${ver}")"
+  dirTo="$(getDir "${dst}@${ver}")"
+  mkdir -p "$dirTo"
 
   cp -r "$dirFrom"/* "$dirTo"
 
 # zipFrom="$(getZip ${pkg}@${ver})"
-  zipFile="$(basename $(getZip ${dst}@${ver}))"
-  cd "$dirTo"
-  unzip $zipFile
-  mkdir -p $(dirname $dst)
-  ln -sv ../../"${pkgver}" "${dst}@${ver}"
+  zipFile="$(basename "$(getZip "${dst}@${ver}")")"
+  cd "$dirTo" || exit
+  unzip "$zipFile"
+  mkdir -p "$(dirname "$dst")"
+  ln -sv "$(relpath "${dst}")${pkgver}" "${dst}@${ver}"
   zip -r tmp.zip "${dst}@${ver}"/*
   mv -f tmp.zip "$zipFile"
   rm -r powerlaw.ai git.milvai.cn
+}
+
+relpath(){
+  echo "$1" | grep -o / | sed s,/,../,g | tr -d '\n'
 }
 
 getInfo(){
@@ -93,7 +97,7 @@ download(){
 #   checkout virtual mod
 
 info(){
-  echo "[GIAO] $@" | grep --color . | tee -a /tmp/golog | cat 1>&2
+  echo "[GIAO]" "$@" | grep --color . | tee -a /tmp/golog | cat 1>&2
 }
 
 list(){
@@ -124,7 +128,7 @@ main(){
     info "DL $pkgver"
     download "$pkgver"
   else
-    info "GO $@"
+    info "GO" "$@"
     "$GO" "$@"
   fi
 }
