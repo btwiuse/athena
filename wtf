@@ -1,6 +1,5 @@
-# golang:1.14 bash -vc '
-# -e GOBIN=/usr/local/go/bin/go \
-##sudo docker run -it \
+#!/usr/bin/env bash
+set -e
 ##  -u root \
 ##  -e GOPRIVATE='*' \
 ##  -e GO111MODULE=on \
@@ -12,19 +11,50 @@
 
 export GONOSUMDB='*'
 export GO111MODULE=on
+export GOPROXY=https://internal-gomod.milvzn.com
 export PROMPT_COMMAND="history -a"
 export GOPATH="$PWD/gopath"
 
-{
-	export GOBIN="$(which go)"
-	export PATH=":$PATH"
-	go list -x -m -json -versions git.milvai.cn/platform/gotools;
+efr() {
+  find "$(go env GOPATH)/pkg/mod/cache/download" -name '*.zip' -o -name '*.mod' -o -name '*.info' | grep -e 'powerlaw.ai|git.milvai.cn' || :
+  echo done
+  read _
+}
 
-	go mod download -json git.milvai.cn/platform/gotools@v1.0.5;
-	go mod download -json powerlaw.ai/platform/gotools@v1.0.5;
-	go list -m -versions -json git.milvai.cn/platform/gotools@v1.0.5;
-	go list -m -versions -json powerlaw.ai/platform/gotools;
-} |& grep -E 'GIAO';
+{
+#export GOBIN="$(which go)"
+	export PATH="$PWD:$PATH"
+  which go
+  cd "$(mktemp -d)"
+  pwd
+
+  go list -m -versions -json git.milvai.cn/thy/gofoundations;
+  efr
+
+  go list -m -versions -json powerlaw.ai/gofoundations;
+  efr
+
+# go list -x -m -json -versions git.milvai.cn/platform/gotools;
+# efr
+
+  go mod download -json git.milvai.cn/thy/gofoundations@v1.0.0;
+  efr
+
+  go mod download -json powerlaw.ai/gofoundations@v1.0.0;
+  efr
+
+  go mod download -json git.milvai.cn/platform/gotools@v1.0.5;
+  efr
+
+  go mod download -json powerlaw.ai/platform/gotools@v1.0.5;
+  efr
+
+  go list -m -versions -json git.milvai.cn/platform/gotools;
+  efr
+
+  go list -m -versions -json powerlaw.ai/platform/gotools;
+  efr
+} # |& grep -E 'GIAO';
 
 {
 	tail -f /tmp/golog &
